@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: claims_postgres
+    environment:
+      POSTGRES_DB: claims_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5435:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - claims_net
+
+  backend:
+    build: ./Backend
+    container_name: claims_backend
+    ports:
+      - "3002:3002"
+    depends_on:
+      - postgres
+    networks:
+      - claims_net
+
+  employee-claims:
+    build: ./Employee-claims
+    container_name: employee_claims_ui
+    ports:
+      - "8111:80"
+    networks:
+      - claims_net
+
+  hr-claims:
+    build: ./HR-claims
+    container_name: hr_claims_ui
+    ports:
+      - "8112:80"
+    networks:
+      - claims_net
+
+volumes:
+  pgdata:
+
+networks:
+  claims_net:
+
